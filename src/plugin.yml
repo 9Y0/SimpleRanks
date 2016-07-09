@@ -1,0 +1,28 @@
+name: SimpleRanks
+main: me.VetBakSim.simpleranks.Main
+version: 1.0
+author: VetBakSim
+website: http://www.kipnetwork.net/
+
+commands:
+  simpleranks:
+    aliases: [sr, ranks, simplerank]
+    description: SimpleRanks main command!
+    
+permissions:
+  simpleranks.create:
+    default: op
+  simpleranks.delete:
+    default: op
+  simpleranks.deleteall:
+    default: op
+  simpleranks.list:
+    default: op
+  simpleranks.addplayer:
+    default: op
+  simpleranks.removeplayer:
+    default: op
+  simpleranks.addperm:
+    default: op
+  simpleranks.removeperm:
+    default: op
