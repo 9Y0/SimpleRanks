@@ -41,8 +41,8 @@ public class ConfigManager {
 	private FileConfiguration config;
 
 	private ConfigManager(String fileName) {
-		if (Main.getInstance().getDataFolder().exists())
-			Main.getInstance().getDataFolder().mkdir();
+		if (!Main.getInstance().getDataFolder().exists())
+			Main.getInstance().getDataFolder().mkdirs();
 
 		file = new File(Main.getInstance().getDataFolder(), fileName + ".yml");
 		if (!file.exists()) {
