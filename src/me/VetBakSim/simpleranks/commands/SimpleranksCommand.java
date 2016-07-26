@@ -33,12 +33,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import com.evilmidget38.UUIDFetcher;
 
 import me.VetBakSim.simpleranks.Rank;
 import me.VetBakSim.simpleranks.RanksManager;
@@ -155,11 +155,13 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			UUID uuid;
-			try {
-				uuid = UUIDFetcher.getUUIDOf(pName);
-			} catch (Exception e) {
-				s.sendMessage(ChatColor.RED + "That player does not exist, or the mojang API is down!");
+			UUID uuid = null;
+			for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+				if (op.getName().equals(pName))
+					uuid = op.getUniqueId();
+			}
+			if (uuid == null) {
+				s.sendMessage(ChatColor.RED + "That player does not exist!");
 				return true;
 			}
 
@@ -200,11 +202,13 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			UUID uuid;
-			try {
-				uuid = UUIDFetcher.getUUIDOf(pName);
-			} catch (Exception e) {
-				s.sendMessage(ChatColor.RED + "That player does not exist, or the mojang API is down!");
+			UUID uuid = null;
+			for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+				if (op.getName().equals(pName))
+					uuid = op.getUniqueId();
+			}
+			if (uuid == null) {
+				s.sendMessage(ChatColor.RED + "That player does not exist!");
 				return true;
 			}
 
@@ -213,7 +217,7 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			rank.removeMember(uuid, pName);
+			rank.removeMember(uuid);
 
 			s.sendMessage(ChatColor.GREEN + "You removed " + ChatColor.DARK_GREEN + pName + ChatColor.GREEN
 					+ " from the rank " + ChatColor.RESET + rank.getName());

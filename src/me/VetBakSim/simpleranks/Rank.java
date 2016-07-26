@@ -63,15 +63,13 @@ public class Rank {
 		PermissionsManager.loadPermissions(p);
 	}
 
-	public void removeMember(UUID uuid, String name) {
+	public void removeMember(UUID uuid) {
 		members.remove(uuid.toString());
+		OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
 		Player p = Bukkit.getPlayer(uuid);
-		if (p == null) {
-			team.removeEntry(name);
-		} else {
+		if (p != null)
 			PermissionsManager.loadPermissions(p);
-			team.removeEntry(p.getName());
-		}
+		team.removeEntry(op.getName());
 	}
 
 	public void addPermission(String... perms) {
