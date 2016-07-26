@@ -10,6 +10,8 @@ commands:
     description: SimpleRanks main command!
     
 permissions:
+  simpleranks.admin:
+    default: op
   simpleranks.create:
     default: op
   simpleranks.delete:
