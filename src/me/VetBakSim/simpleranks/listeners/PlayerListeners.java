@@ -23,12 +23,17 @@
  */
 package me.VetBakSim.simpleranks.listeners;
 
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.VetBakSim.simpleranks.PermissionsManager;
 import me.VetBakSim.simpleranks.Rank;
@@ -39,21 +44,41 @@ public class PlayerListeners implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerLoginEvent e) {
 		Player p = e.getPlayer();
-		Rank rank = RanksManager.getInstance().getRank(p.getUniqueId());
+		Rank rank = RanksManager.getRank(p.getUniqueId());
 		if (rank == null)
 			return;
 		if (!rank.getTeam().getEntries().contains(p.getName()))
 			rank.getTeam().addEntry(p.getName());
-		PermissionsManager.getInstance().loadPermissions(p);
+		PermissionsManager.loadPermissions(p);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
-		Rank rank = RanksManager.getInstance().getRank(p.getUniqueId());
-		if (rank == null)
-			return;
-		e.setFormat(rank.getPrefix() + " " + e.getFormat());
+		Rank rank = RanksManager.getRank(p.getUniqueId());
+
+		if (e.getMessage().startsWith("!")) {
+			e.setMessage(e.getMessage().substring(1));
+			if (rank == null)
+				return;
+			e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
+			e.getRecipients().add(p);
+			e.setFormat(ChatColor.DARK_AQUA + "[" + ChatColor.RESET + rank.getName() + ChatColor.DARK_AQUA + " Chat] "
+					+ ChatColor.RESET + e.getFormat());
+			for (String member : rank.getMembers()) {
+				Player pl = Bukkit.getPlayer(UUID.fromString(member));
+				if (pl != null)
+					e.getRecipients().add(pl);
+			}
+		} else {
+			if (rank != null)
+				e.setFormat(rank.getPrefix() + " " + e.getFormat());
+		}
+	}
+
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e) {
+		PermissionsManager.getAttachments().remove(e.getPlayer().getUniqueId());
 	}
 
 }
