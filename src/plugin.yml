@@ -26,3 +26,9 @@ permissions:
     default: op
   simpleranks.removeperm:
     default: op
+  simpleranks.setfriendlyfire:
+    default: op
+  simpleranks.loadpermsfromfile:
+    default: op
+  simpleranks.permlist:
+    default: op
