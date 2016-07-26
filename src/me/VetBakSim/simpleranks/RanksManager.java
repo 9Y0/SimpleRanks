@@ -23,8 +23,9 @@
  */
 package me.VetBakSim.simpleranks;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -36,47 +37,40 @@ import org.bukkit.entity.Player;
 
 public class RanksManager {
 
-	private static RanksManager instance = new RanksManager();
+	private static Set<Rank> ranks = new HashSet<>();
 
-	private List<Rank> ranks;
-
-	private RanksManager() {
-		this.ranks = new ArrayList<>();
-	}
-
-	public Rank addRank(String name, String prefix, List<String> members, List<String> perms) {
+	public static Rank addRank(String name, String prefix, List<String> members, List<String> perms) {
 		Rank rank = new Rank(name, prefix, members, perms);
 		ranks.add(rank);
 
 		for (String member : rank.getMembers()) {
-			Player p = Bukkit.getServer().getPlayer(UUID.fromString(member));
+			Player p = Bukkit.getPlayer(member);
 			if (p != null) {
-				PermissionsManager.getInstance().loadPermissions(p);
-				rank.getTeam().addEntry(p.getName());
+				PermissionsManager.loadPermissions(p);
 			}
 		}
 
 		return rank;
 	}
 
-	public void removeAllRanks() {
-		List<Rank> tempList = ranks;
-		ranks = new ArrayList<>();
+	public static void removeAllRanks() {
+		Set<Rank> tempList = ranks;
+		ranks = new HashSet<>();
 
 		for (Rank rank : tempList) {
 			rank.remove();
 		}
 	}
 
-	public Rank getRank(String name) {
+	public static Rank getRank(String name) {
 		for (Rank rank : ranks) {
-			if (rank.getNameWithoutColors().equalsIgnoreCase(ChatColor.stripColor(name)))
+			if (ChatColor.stripColor(rank.getName()).equalsIgnoreCase(ChatColor.stripColor(name)))
 				return rank;
 		}
 		return null;
 	}
 
-	public Rank getRank(UUID uuid) {
+	public static Rank getRank(UUID uuid) {
 		for (Rank rank : ranks) {
 			if (rank.getMembers().contains(uuid.toString()))
 				return rank;
@@ -85,7 +79,7 @@ public class RanksManager {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void saveRanks() {
+	public static void saveRanks() {
 		FileConfiguration cfg = ConfigManager.getRanks().getConfig();
 
 		for (Rank rank : ranks) {
@@ -103,7 +97,7 @@ public class RanksManager {
 		ConfigManager.getRanks().save();
 	}
 
-	public void loadRanks() {
+	public static void loadRanks() {
 		FileConfiguration cfg = ConfigManager.getRanks().getConfig();
 
 		for (String name : cfg.getKeys(false)) {
@@ -116,12 +110,8 @@ public class RanksManager {
 		ConfigManager.getRanks().save();
 	}
 
-	public List<Rank> getRanks() {
+	public static Set<Rank> getRanks() {
 		return ranks;
-	}
-
-	public static RanksManager getInstance() {
-		return instance;
 	}
 
 }

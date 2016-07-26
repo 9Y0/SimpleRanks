@@ -32,11 +32,9 @@ import org.bukkit.permissions.PermissionAttachment;
 
 public class PermissionsManager {
 
-	private static PermissionsManager instance = new PermissionsManager();
+	private static final Map<UUID, PermissionAttachment> attachments = new HashMap<>();
 
-	private Map<UUID, PermissionAttachment> attachments;
-
-	public void loadPermissions(Player p) {
+	public static void loadPermissions(Player p) {
 		PermissionAttachment attachment;
 		if (attachments.containsKey(p.getUniqueId()))
 			attachment = attachments.get(p.getUniqueId());
@@ -49,7 +47,7 @@ public class PermissionsManager {
 			attachment.setPermission(perm, false);
 		}
 
-		Rank rank = RanksManager.getInstance().getRank(p.getUniqueId());
+		Rank rank = RanksManager.getRank(p.getUniqueId());
 		if (rank == null)
 			return;
 		for (String perm : rank.getPermissions()) {
@@ -57,16 +55,8 @@ public class PermissionsManager {
 		}
 	}
 
-	private PermissionsManager() {
-		attachments = new HashMap<>();
-	}
-
-	public Map<UUID, PermissionAttachment> getAttachments() {
+	public static Map<UUID, PermissionAttachment> getAttachments() {
 		return attachments;
-	}
-
-	public static PermissionsManager getInstance() {
-		return instance;
 	}
 
 }
