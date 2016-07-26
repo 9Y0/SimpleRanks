@@ -52,7 +52,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("create")) {
-			if (!s.hasPermission("simpleranks.create")) {
+			if (!s.hasPermission("simpleranks.create") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -79,7 +79,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("delete")) {
-			if (!s.hasPermission("simpleranks.delete")) {
+			if (!s.hasPermission("simpleranks.delete") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -101,7 +101,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("deleteall")) {
-			if (!s.hasPermission("simpleranks.deleteall")) {
+			if (!s.hasPermission("simpleranks.deleteall") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -115,7 +115,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("list")) {
-			if (!s.hasPermission("simpleranks.list")) {
+			if (!s.hasPermission("simpleranks.list") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -137,7 +137,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("addplayer")) {
-			if (!s.hasPermission("simpleranks.addplayer")) {
+			if (!s.hasPermission("simpleranks.addplayer") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -182,7 +182,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("removeplayer")) {
-			if (!s.hasPermission("simpleranks.removeplayer")) {
+			if (!s.hasPermission("simpleranks.removeplayer") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -220,7 +220,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("addperm")) {
-			if (!s.hasPermission("simpleranks.addperm")) {
+			if (!s.hasPermission("simpleranks.addperm") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -249,7 +249,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("removeperm")) {
-			if (!s.hasPermission("simpleranks.removeperm")) {
+			if (!s.hasPermission("simpleranks.removeperm") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -278,7 +278,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("setfriendlyfire")) {
-			if (!s.hasPermission("simpleranks.setfriendlyfire")) {
+			if (!s.hasPermission("simpleranks.setfriendlyfire") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -305,7 +305,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("loadpermsfromfile")) {
-			if (!s.hasPermission("simpleranks.loadpermsfromfile")) {
+			if (!s.hasPermission("simpleranks.loadpermsfromfile") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
@@ -360,7 +360,7 @@ public class SimpleranksCommand implements CommandExecutor {
 		}
 
 		else if (args[0].equalsIgnoreCase("permlist")) {
-			if (!s.hasPermission("simpleranks.permlist")) {
+			if (!s.hasPermission("simpleranks.permlist") && !s.hasPermission("simpleranks.admin")) {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
