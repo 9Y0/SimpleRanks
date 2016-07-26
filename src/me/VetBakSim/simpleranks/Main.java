@@ -40,12 +40,12 @@ public class Main extends JavaPlugin {
 		Bukkit.getServer().getPluginManager().registerEvents(new PlayerListeners(), this);
 		getCommand("simpleranks").setExecutor(new SimpleranksCommand());
 
-		RanksManager.getInstance().loadRanks();
+		RanksManager.loadRanks();
 	}
 
 	@Override
 	public void onDisable() {
-		RanksManager.getInstance().saveRanks();
+		RanksManager.saveRanks();
 	}
 
 	public static Main getInstance() {
