@@ -23,7 +23,14 @@
  */
 package me.VetBakSim.simpleranks.commands;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -62,12 +69,11 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			if (RanksManager.getInstance().getRank(rankName) != null) {
+			if (RanksManager.getRank(rankName) != null) {
 				s.sendMessage(ChatColor.RED + "A rank with that name does already exists!");
 				return true;
 			}
-			Rank rank = RanksManager.getInstance().addRank(rankName, prefix, new ArrayList<String>(),
-					new ArrayList<String>());
+			Rank rank = RanksManager.addRank(rankName, prefix, new ArrayList<String>(), new ArrayList<String>());
 			s.sendMessage(ChatColor.GREEN + "You created rank " + ChatColor.RESET + rank.getName() + ChatColor.GREEN
 					+ " with the prefix " + ChatColor.RESET + rank.getPrefix());
 		}
@@ -84,7 +90,7 @@ public class SimpleranksCommand implements CommandExecutor {
 
 			String rankName = chatColor(args[1]);
 
-			Rank rank = RanksManager.getInstance().getRank(rankName);
+			Rank rank = RanksManager.getRank(rankName);
 			if (rank == null) {
 				s.sendMessage(rankName + ChatColor.RED + " is not a rank!");
 				return true;
@@ -104,7 +110,7 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			RanksManager.getInstance().removeAllRanks();
+			RanksManager.removeAllRanks();
 			s.sendMessage(ChatColor.GREEN + "You deleted all ranks!");
 		}
 
@@ -113,14 +119,14 @@ public class SimpleranksCommand implements CommandExecutor {
 				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
 				return true;
 			}
-			if (RanksManager.getInstance().getRanks().isEmpty()) {
+			if (RanksManager.getRanks().isEmpty()) {
 				s.sendMessage(ChatColor.RED + "There are no ranks at the moment!");
 				return true;
 			}
 
 			StringBuilder sb = new StringBuilder();
 			sb.append(ChatColor.GOLD + "Ranks: " + ChatColor.RESET);
-			for (Rank rank : RanksManager.getInstance().getRanks()) {
+			for (Rank rank : RanksManager.getRanks()) {
 				sb.append(rank.getName() + ChatColor.RESET + ", ");
 			}
 
@@ -143,7 +149,7 @@ public class SimpleranksCommand implements CommandExecutor {
 			String rankName = chatColor(args[2]);
 			String pName = args[1];
 
-			Rank rank = RanksManager.getInstance().getRank(rankName);
+			Rank rank = RanksManager.getRank(rankName);
 			if (rank == null) {
 				s.sendMessage(rankName + ChatColor.RED + " is not a rank!");
 				return true;
@@ -153,7 +159,7 @@ public class SimpleranksCommand implements CommandExecutor {
 			try {
 				uuid = UUIDFetcher.getUUIDOf(pName);
 			} catch (Exception e) {
-				s.sendMessage(ChatColor.RED + "That player does not exist");
+				s.sendMessage(ChatColor.RED + "That player does not exist, or the mojang API is down!");
 				return true;
 			}
 
@@ -162,7 +168,7 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			for (Rank otherRank : RanksManager.getInstance().getRanks()) {
+			for (Rank otherRank : RanksManager.getRanks()) {
 				if (otherRank.getMembers().contains(uuid.toString())) {
 					s.sendMessage(ChatColor.RED + pName + " is already a member of the rank " + ChatColor.RESET
 							+ otherRank.getName());
@@ -188,7 +194,7 @@ public class SimpleranksCommand implements CommandExecutor {
 			String rankName = chatColor(args[2]);
 			String pName = args[1];
 
-			Rank rank = RanksManager.getInstance().getRank(rankName);
+			Rank rank = RanksManager.getRank(rankName);
 			if (rank == null) {
 				s.sendMessage(rankName + ChatColor.RED + " is not a rank!");
 				return true;
@@ -198,7 +204,7 @@ public class SimpleranksCommand implements CommandExecutor {
 			try {
 				uuid = UUIDFetcher.getUUIDOf(pName);
 			} catch (Exception e) {
-				s.sendMessage(ChatColor.RED + "That player does not exist");
+				s.sendMessage(ChatColor.RED + "That player does not exist, or the mojang API is down!");
 				return true;
 			}
 
@@ -207,7 +213,7 @@ public class SimpleranksCommand implements CommandExecutor {
 				return true;
 			}
 
-			rank.removeMember(uuid);
+			rank.removeMember(uuid, pName);
 
 			s.sendMessage(ChatColor.GREEN + "You removed " + ChatColor.DARK_GREEN + pName + ChatColor.GREEN
 					+ " from the rank " + ChatColor.RESET + rank.getName());
@@ -226,7 +232,7 @@ public class SimpleranksCommand implements CommandExecutor {
 			String rankName = chatColor(args[2]);
 			String perm = args[1];
 
-			Rank rank = RanksManager.getInstance().getRank(rankName);
+			Rank rank = RanksManager.getRank(rankName);
 			if (rank == null) {
 				s.sendMessage(ChatColor.RED + rankName + " is not a rank!");
 				return true;
@@ -255,7 +261,7 @@ public class SimpleranksCommand implements CommandExecutor {
 			String rankName = chatColor(args[2]);
 			String perm = args[1];
 
-			Rank rank = RanksManager.getInstance().getRank(rankName);
+			Rank rank = RanksManager.getRank(rankName);
 			if (rank == null) {
 				s.sendMessage(ChatColor.RED + rankName + " is not a rank!");
 				return true;
@@ -271,8 +277,112 @@ public class SimpleranksCommand implements CommandExecutor {
 					+ " for the rank " + ChatColor.RESET + rank.getName());
 		}
 
-		else if (args[0].equalsIgnoreCase("help")) {
-			sendHelp(s);
+		else if (args[0].equalsIgnoreCase("setfriendlyfire")) {
+			if (!s.hasPermission("simpleranks.setfriendlyfire")) {
+				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
+				return true;
+			}
+			if (args.length != 3) {
+				s.sendMessage(ChatColor.RED + "Usage: /sr setfriendlyfire [rank] [true/false]");
+				return true;
+			}
+
+			String booleanString = args[2];
+			if (!isBoolean(booleanString)) {
+				s.sendMessage(ChatColor.RED + booleanString + " is not equal to true or false!");
+				return true;
+			}
+			String rankName = chatColor(args[1]);
+			Rank rank = RanksManager.getRank(rankName);
+			if (rank == null) {
+				s.sendMessage(ChatColor.RED + rankName + " is not a rank!");
+				return true;
+			}
+
+			rank.getTeam().setAllowFriendlyFire(Boolean.parseBoolean(booleanString));
+			s.sendMessage(ChatColor.GREEN + "You set the friendlyfire of the rank " + ChatColor.RESET + rank.getName()
+					+ ChatColor.GREEN + " equal to " + ChatColor.YELLOW + booleanString);
+		}
+
+		else if (args[0].equalsIgnoreCase("loadpermsfromfile")) {
+			if (!s.hasPermission("simpleranks.loadpermsfromfile")) {
+				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
+				return true;
+			}
+			if (args.length != 3) {
+				s.sendMessage(ChatColor.RED + "Usage: /sr loadpermsfromfile [rank] [file path]");
+				return true;
+			}
+
+			String rankName = chatColor(args[1]);
+			Rank rank = RanksManager.getRank(rankName);
+			if (rank == null) {
+				s.sendMessage(ChatColor.RED + rankName + " is not a rank!");
+				return true;
+			}
+
+			String filePath = args[2];
+			File file = new File(filePath);
+			if (!file.exists()) {
+				s.sendMessage(ChatColor.RED + "That file does not exist!");
+				return true;
+			}
+			if (!file.isFile()) {
+				s.sendMessage(ChatColor.RED + "That is a directory and not a file!");
+				return true;
+			}
+			if (!file.canRead()) {
+				s.sendMessage(ChatColor.RED + "That file couldn't be read!");
+				return true;
+			}
+
+			try {
+				DataInputStream in = new DataInputStream(new FileInputStream(file));
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				List<String> tempPerms = new ArrayList<>();
+				for (String line; (line = br.readLine()) != null;) {
+					if (rank.getPermissions().contains(line))
+						continue;
+					tempPerms.add(line);
+				}
+				rank.addPermission((String[]) tempPerms.toArray());
+				in.close();
+				br.close();
+			} catch (IOException e) {
+				s.sendMessage(ChatColor.RED
+						+ "Something went wrong while loading the permissions from the file! See the console for more info!");
+				e.printStackTrace();
+				return true;
+			}
+
+			s.sendMessage(ChatColor.GREEN + "You added all permissions from the file to the rank " + ChatColor.RESET
+					+ rank.getName() + ChatColor.GREEN + "! Now you can delete the file, it's not longer needed!");
+		}
+
+		else if (args[0].equalsIgnoreCase("permlist")) {
+			if (!s.hasPermission("simpleranks.permlist")) {
+				s.sendMessage(ChatColor.DARK_RED + "You don't have permission to do this!");
+				return true;
+			}
+			if (args.length != 2) {
+				s.sendMessage(ChatColor.RED + "Usage: /sr permlist [rank]");
+				return true;
+			}
+
+			String rankName = chatColor(args[1]);
+			Rank rank = RanksManager.getRank(rankName);
+			if (rank == null) {
+				s.sendMessage(ChatColor.RED + rankName + " is not a rank!");
+				return true;
+			}
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(ChatColor.GOLD + "\nThe permissions(" + rank.getPermissions().size() + ") of the rank "
+					+ ChatColor.RESET + rank.getName() + ChatColor.GOLD + " are:");
+			for (String perm : rank.getPermissions()) {
+				sb.append(ChatColor.YELLOW + perm + "\n");
+			}
+			s.sendMessage(sb.toString());
 		}
 
 		else {
@@ -293,17 +403,28 @@ public class SimpleranksCommand implements CommandExecutor {
 		sb.append(ChatColor.GOLD + "/sr delete [rank] " + line + " Delete a rank!\n");
 		sb.append(ChatColor.GOLD + "/sr deleteall " + line + " Delete all ranks!\n");
 		sb.append(ChatColor.GOLD + "/sr list " + line + " See a list of all ranks!\n");
+		sb.append(ChatColor.GOLD + "/sr permlist [rank] " + line + " See all permissions of a rank!\n");
 		sb.append(ChatColor.GOLD + "/sr addplayer [player] [rank] " + line + " Add a player to a rank!\n");
 		sb.append(ChatColor.GOLD + "/sr removeplayer [player] [rank] " + line + " Remove a player from a rank!\n");
 		sb.append(ChatColor.GOLD + "/sr addperm [perm] [rank] " + line + " Add a permssion to a rank!\n");
 		sb.append(ChatColor.GOLD + "/sr removeperm [perm] [rank] " + line + " Remove a permission form a rank!\n");
-		sb.append(ChatColor.GOLD + "/sr help " + line + " Shows this message");
+		sb.append(ChatColor.GOLD + "/sr setfriendlyfire [rank] [true/false] " + line
+				+ " Set friendly fire for a rank to true or false!\n");
+		sb.append(ChatColor.GOLD + "/sr loadpermsfromfile [rank] [file path] " + line
+				+ " Load permissions from a txt file into a rank!\n");
+		sb.append(ChatColor.GOLD + "/sr help " + line + " Shows this message\n\n");
 
-		s.sendMessage(sb.toString().trim());
+		s.sendMessage(sb.toString());
 	}
 
 	private String chatColor(String input) {
 		return ChatColor.translateAlternateColorCodes('&', input);
+	}
+
+	private boolean isBoolean(String str) {
+		if (!str.equalsIgnoreCase("true") && !str.equalsIgnoreCase("false"))
+			return false;
+		return true;
 	}
 
 }
