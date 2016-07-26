@@ -56,40 +56,42 @@ public class Rank {
 
 	public void addMember(UUID uuid) {
 		members.add(uuid.toString());
-		Player p = Bukkit.getServer().getPlayer(uuid);
-		if (p != null) {
-			team.addEntry(p.getName());
-			PermissionsManager.getInstance().loadPermissions(p);
-		}
+		Player p = Bukkit.getPlayer(uuid);
+		if (p == null)
+			return;
+		team.addEntry(p.getName());
+		PermissionsManager.loadPermissions(p);
 	}
 
-	public void removeMember(UUID uuid) {
+	public void removeMember(UUID uuid, String name) {
 		members.remove(uuid.toString());
-		Player p = Bukkit.getServer().getPlayer(uuid);
-		if (p != null) {
+		Player p = Bukkit.getPlayer(uuid);
+		if (p == null) {
+			team.removeEntry(name);
+		} else {
+			PermissionsManager.loadPermissions(p);
 			team.removeEntry(p.getName());
-			PermissionsManager.getInstance().loadPermissions(p);
 		}
 	}
 
-	public void addPermission(String perm) {
-		perms.add(perm);
+	public void addPermission(String... perms) {
+		for (String perm : perms)
+			this.perms.add(perm);
 		for (String uuidString : members) {
-			Player p = Bukkit.getServer().getPlayer(UUID.fromString(uuidString));
-			if (p != null) {
-				PermissionsManager.getInstance().loadPermissions(p);
-			}
+			Player p = Bukkit.getPlayer(UUID.fromString(uuidString));
+			if (p == null)
+				return;
+			PermissionsManager.loadPermissions(p);
 		}
 	}
 
 	public void removePermission(String perm) {
 		perms.remove(perm);
 		for (String uuidString : members) {
-			Player p = Bukkit.getServer().getPlayer(UUID.fromString(uuidString));
-			if (p != null) {
-				System.out.println("player found");
-				PermissionsManager.getInstance().loadPermissions(p);
-			}
+			Player p = Bukkit.getPlayer(UUID.fromString(uuidString));
+			if (p == null)
+				return;
+			PermissionsManager.loadPermissions(p);
 		}
 	}
 
@@ -99,23 +101,15 @@ public class Rank {
 			team.removePlayer(p);
 		}
 		team.unregister();
-		RanksManager.getInstance().getRanks().remove(this);
+		RanksManager.getRanks().remove(this);
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public String getNameWithoutColors() {
-		return ChatColor.stripColor(name);
-	}
-
 	public String getPrefix() {
 		return prefix;
-	}
-
-	public String getPrefixWithoutColors() {
-		return ChatColor.stripColor(prefix);
 	}
 
 	public List<String> getPermissions() {
